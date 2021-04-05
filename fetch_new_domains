@@ -39,7 +39,7 @@ def add_date_data(date=datetime.date.today() - datetime.timedelta(days=1)):
         # Read and append it to list
         with open('domain-names.txt','r') as fin, open('all_registered_domains.csv','a') as fout:
             for l in fin.readlines():
-                fout.write(f'{l[:-1]},{today_str}\n')
+                fout.write(l[:-1] + ',' +today_str + '\n')
         # Remove redundant files
         os.remove('domain-names.txt')
         os.remove(today_str+'.zip')
