@@ -24,7 +24,7 @@ def download_file(url,fname):
 def add_date_data(date=datetime.date.today() - datetime.timedelta(days=1)):
     # Download list from whoisds
     url = 'https://whoisds.com//whois-database/newly-registered-domains/{}/nrd'
-    today_str = f'{date.year}-{date.month:02}-{date.day:02}.zip'
+    today_str = '{}-{:02}-{:02}.zip'.format(date.year,date.month,date.day)
     variable_part = base64.b64encode(today_str.encode()).decode('utf-8')
     print (url.format(variable_part))
     if not download_file(url.format(variable_part),today_str):
