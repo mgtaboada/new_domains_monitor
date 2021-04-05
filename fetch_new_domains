@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+#coding:utf-8
+import datetime
+import base64
+from urllib.request import urlopen,Request
+import shutil
+import zipfile
+import os
+
+def download_file(url,fname):
+    req = Request(
+        url,
+        data=None,
+        headers={
+            "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36"
+        }
+    )
+    try:
+        with urlopen(req) as response, open(fname,'wb') as f:
+            shutil.copyfileobj(response,f)
+        return True
+    except:
+        return False
+def add_date_data(date=datetime.date.today() - datetime.timedelta(days=1)):
+    # Download list from whoisds
+    url = 'https://whoisds.com//whois-database/newly-registered-domains/{}/nrd'
+    today_str = f'{date.year}-{date.month:02}-{date.day:02}.zip'
+    variable_part = base64.b64encode(today_str.encode()).decode('utf-8')
+    print (url.format(variable_part))
+    if not download_file(url.format(variable_part),today_str):
+        return False
+
+    # unzip it
+    try:
+        with zipfile.ZipFile(today_str, 'r') as zip_ref:
+            zip_ref.extractall('.')
+        today_str = f'{date.year}-{date.month:02}-{date.day:02}'
+        # Read and append it to list
+        with open('domain-names.txt','r') as fin, open('all_registered_domains.csv','a') as fout:
+            for l in fin.readlines():
+                fout.write(f'{l[:-1]},{today_str}\n')
+        # Remove redundant files
+        os.remove('domain-names.txt')
+        os.remove(today_str+'.zip')
+        return True
+    except:
+        os.remove(today_str)
+        return False
+
+def download_since(date):
+    today = datetime.date.today()-datetime.timedelta(days=1)
+    before = date
+    while before != today:
+        print(before)
+        add_date_data(before)
+        before = before + datetime.timedelta(days=1)
+if __name__ == '__main__':
+    download_since(datetime.date(2021,1,1))
+    #add_date_data()
