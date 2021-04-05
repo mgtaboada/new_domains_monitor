@@ -34,7 +34,8 @@ def add_date_data(date=datetime.date.today() - datetime.timedelta(days=1)):
     try:
         with zipfile.ZipFile(today_str, 'r') as zip_ref:
             zip_ref.extractall('.')
-        today_str = f'{date.year}-{date.month:02}-{date.day:02}'
+
+        today_str = '{}-{:02}-{:02}'.format(date.year,date.month,date.day)
         # Read and append it to list
         with open('domain-names.txt','r') as fin, open('all_registered_domains.csv','a') as fout:
             for l in fin.readlines():
